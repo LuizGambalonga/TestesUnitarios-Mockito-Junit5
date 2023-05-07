@@ -1,5 +1,6 @@
 package br.com.luiz_gambalonga.api.resources.exceptions;
 
+import br.com.luiz_gambalonga.api.services.exceptions.DataIntegrateViolationException;
 import br.com.luiz_gambalonga.api.services.exceptions.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,5 +17,11 @@ public class ResourceExceptionHandler {
     public ResponseEntity<ErrosPadrao> objetoNaoEncontrado(ObjectNotFoundException ex, HttpServletRequest request){
            ErrosPadrao erros = new ErrosPadrao(LocalDateTime.now(), HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getRequestURI());
            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erros);
+    }
+
+    @ExceptionHandler(DataIntegrateViolationException.class)
+    public ResponseEntity<ErrosPadrao> DataIntegrateViolationException (DataIntegrateViolationException ex, HttpServletRequest request){
+        ErrosPadrao erros = new ErrosPadrao(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
     }
 }
