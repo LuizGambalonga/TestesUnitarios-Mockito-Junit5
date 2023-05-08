@@ -3,6 +3,7 @@ package br.com.luiz_gambalonga.api.services.impl;
 import br.com.luiz_gambalonga.api.domain.Usuario;
 import br.com.luiz_gambalonga.api.domain.dto.UsuarioDTO;
 import br.com.luiz_gambalonga.api.repositories.UsuarioRepository;
+import br.com.luiz_gambalonga.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,16 @@ class UsuarioServiceImplTest {
         Assertions.assertEquals(Usuario.class, response.getClass());
         Assertions.assertEquals(ID,response.getId());
     }
-
+    @Test
+    void whenFindByIdThenReturnObjectoNotFoundException(){
+        Mockito.when(usuarioRepository.findById(Mockito.anyLong())).thenThrow(new ObjectNotFoundException("Não localizado o usuario!"));
+        try{
+            service.findById(ID);
+        }catch (Exception e){
+            Assertions.assertEquals(ObjectNotFoundException.class,e.getClass());
+            Assertions.assertEquals("Não localizado o usuario!", e.getMessage());
+        }
+    }
     @Test
     void findAll() {
     }
