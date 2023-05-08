@@ -37,9 +37,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         findByEmail(usuarioDTO);
         return usuarioRepository.save(mapper.map(usuarioDTO,Usuario.class));
     }
+
+    @Override
+    public Usuario update(UsuarioDTO usuarioDTO) {
+        findByEmail(usuarioDTO);
+        return usuarioRepository.save(mapper.map(usuarioDTO, Usuario.class));
+    }
+
+    @Override
+    public void delete(Long id) {
+        findById(id);
+        usuarioRepository.deleteById(id);
+    }
+
     private void findByEmail(UsuarioDTO obj){
         Optional<Usuario> usuario = usuarioRepository.findByEmail(obj.getEmail());
-        if(usuario.isPresent()){
+        if(usuario.isPresent() && !usuario.get().getId().equals(obj.getId())){
             throw new DataIntegrateViolationException("Já existe um Email cadastrado com este nome");
         }
     }
