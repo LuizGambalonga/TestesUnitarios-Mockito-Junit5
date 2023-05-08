@@ -72,7 +72,17 @@ class UsuarioServiceImplTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {
+        Mockito.when(usuarioRepository.save(Mockito.any())).thenReturn(usuarioBanco);
+        Usuario response = service.create(usuarioDTO);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Usuario.class,response.getClass());
+        Assertions.assertEquals(ID,response.getId());
+        Assertions.assertEquals(NAME,response.getNome());
+        Assertions.assertEquals(EMAIL,response.getEmail());
+        Assertions.assertEquals(SENHA,response.getSenha());
+
     }
 
     @Test
