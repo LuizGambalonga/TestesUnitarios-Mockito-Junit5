@@ -11,7 +11,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class UsuarioResourceTest {
 
@@ -20,7 +24,6 @@ class UsuarioResourceTest {
     public static final String EMAIL = "GAMBALONGALUIZHENRIQUE@GMAIL.COM";
     public static final String SENHA = "123";
     public static final String JA_EXISTE_UM_EMAIL_CADASTRADO_COM_ESTE_NOME = "Já existe um Email cadastrado com este nome";
-
 
     @InjectMocks
     private UsuarioResource resource;
@@ -57,7 +60,19 @@ class UsuarioResourceTest {
     }
 
     @Test
-    void findAll() {
+    void whenFindAllReturnAListOfUsuarioDTO() {
+        Mockito.when(service.findAll()).thenReturn(List.of(usuarioBanco));
+        Mockito.when(mapper.map(Mockito.any(),Mockito.any())).thenReturn(usuarioDTO);
+
+        ResponseEntity<List<UsuarioDTO>> response = resource.findAll();
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(ResponseEntity.class,response.getClass());
+        Assertions.assertEquals(ArrayList.class,response.getBody().getClass());
+        Assertions.assertEquals(UsuarioDTO.class, response.getBody().get(0).getClass());
+
+        Assertions.assertEquals(ID,response.getBody().get(0).getId());
     }
 
     @Test
