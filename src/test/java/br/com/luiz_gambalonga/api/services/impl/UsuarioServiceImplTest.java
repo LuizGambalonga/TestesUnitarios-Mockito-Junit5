@@ -24,6 +24,7 @@ class UsuarioServiceImplTest {
     public static final String NAME = "LUIZ HENRIQUE";
     public static final String EMAIL = "GAMBALONGALUIZHENRIQUE@GMAIL.COM";
     public static final String SENHA = "123";
+    public static final String JA_EXISTE_UM_EMAIL_CADASTRADO_COM_ESTE_NOME = "Já existe um Email cadastrado com este nome";
 
     @InjectMocks
     private UsuarioServiceImpl service;
@@ -94,7 +95,7 @@ class UsuarioServiceImplTest {
             service.create(usuarioDTO);
         }catch (Exception e){
             Assertions.assertEquals(DataIntegrateViolationException.class, e.getClass());
-            Assertions.assertEquals("Já existe um Email cadastrado com este nome",e.getMessage());
+            Assertions.assertEquals(JA_EXISTE_UM_EMAIL_CADASTRADO_COM_ESTE_NOME,e.getMessage());
         }
     }
 
@@ -111,14 +112,41 @@ class UsuarioServiceImplTest {
         Assertions.assertEquals(SENHA,response.getSenha());
     }
 
-
     @Test
-    void update() {
+    void whenUpdateThenReturnAnDataIntegrityViolationException() {
+        Mockito.when(usuarioRepository.findByEmail(Mockito.anyString())).thenReturn(optionalUsuarioBanco);
+
+        try{
+            optionalUsuarioBanco.get().setId(5L);
+            service.update(usuarioDTO);
+        }catch (Exception e){
+            Assertions.assertEquals(DataIntegrateViolationException.class, e.getClass());
+            Assertions.assertEquals(JA_EXISTE_UM_EMAIL_CADASTRADO_COM_ESTE_NOME,e.getMessage());
+        }
     }
 
     @Test
-    void delete() {
+    void deleteWithSuccess() {
+        Mockito.when(usuarioRepository.findById(Mockito.anyLong()))
+                    .thenReturn(optionalUsuarioBanco);
+        Mockito.doNothing().when(usuarioRepository).deleteById(Mockito.anyLong());
+        service.delete(ID);
+        Mockito.verify(usuarioRepository,Mockito.times(1)).
+                deleteById(Mockito.anyLong());
     }
+
+    @Test
+    void deleteWithObjectNotFoundException() {
+        Mockito.when(usuarioRepository.findById(Mockito.anyLong()))
+                .thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+        try{
+            service.delete(ID);
+        }catch (Exception e){
+            Assertions.assertEquals(ObjectNotFoundException.class, e.getClass());
+            Assertions.assertEquals("Objeto não encontrado", e.getMessage());
+        }
+    }
+
     private void startUsuario(){
         usuarioBanco = new Usuario(ID,NAME, EMAIL, SENHA);
         usuarioDTO = new UsuarioDTO(ID,NAME, EMAIL, SENHA);
