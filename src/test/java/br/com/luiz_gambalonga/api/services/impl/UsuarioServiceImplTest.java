@@ -3,6 +3,7 @@ package br.com.luiz_gambalonga.api.services.impl;
 import br.com.luiz_gambalonga.api.domain.Usuario;
 import br.com.luiz_gambalonga.api.domain.dto.UsuarioDTO;
 import br.com.luiz_gambalonga.api.repositories.UsuarioRepository;
+import br.com.luiz_gambalonga.api.services.exceptions.DataIntegrateViolationException;
 import br.com.luiz_gambalonga.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +83,19 @@ class UsuarioServiceImplTest {
         Assertions.assertEquals(NAME,response.getNome());
         Assertions.assertEquals(EMAIL,response.getEmail());
         Assertions.assertEquals(SENHA,response.getSenha());
+    }
 
+    @Test
+    void whenCreateThenReturnAnDataIntegrityViolationException() {
+        Mockito.when(usuarioRepository.findByEmail(Mockito.anyString())).thenReturn(optionalUsuarioBanco);
+
+        try{
+            optionalUsuarioBanco.get().setId(5L);
+            service.create(usuarioDTO);
+        }catch (Exception e){
+            Assertions.assertEquals(DataIntegrateViolationException.class, e.getClass());
+            Assertions.assertEquals("Já existe um Email cadastrado com este nome",e.getMessage());
+        }
     }
 
     @Test
