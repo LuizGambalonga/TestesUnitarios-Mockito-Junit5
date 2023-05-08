@@ -13,6 +13,9 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,19 +79,34 @@ class UsuarioResourceTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnCreated() {
+        Mockito.when(service.create(Mockito.any())).thenReturn(usuarioBanco);
+        ResponseEntity<UsuarioDTO> response = resource.create(usuarioDTO);
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        Assertions.assertNotNull(response.getHeaders().get("Location"));
     }
 
     @Test
-    void update() {
+    void whenUpdateReturnSuccess() {
+        Mockito.when(service.update(usuarioDTO)).thenReturn(usuarioBanco);
+        Mockito.when(mapper.map(Mockito.any(),Mockito.any())).thenReturn(usuarioDTO);
+        ResponseEntity<UsuarioDTO> response = resource.update(ID,usuarioDTO);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(ResponseEntity.class,response.getClass());
+        Assertions.assertEquals(UsuarioDTO.class,response.getBody().getClass());
+
+        Assertions.assertEquals(ID,response.getBody().getId());
     }
 
-    @Test
-    void testUpdate() {
-    }
 
     private void startUsuario(){
         usuarioBanco = new Usuario(ID,NAME, EMAIL, SENHA);
         usuarioDTO = new UsuarioDTO(ID,NAME, EMAIL, SENHA);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(attributes);
     }
 }
