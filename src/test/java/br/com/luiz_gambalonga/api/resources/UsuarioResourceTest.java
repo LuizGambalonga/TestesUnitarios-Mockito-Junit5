@@ -3,12 +3,15 @@ package br.com.luiz_gambalonga.api.resources;
 import br.com.luiz_gambalonga.api.domain.Usuario;
 import br.com.luiz_gambalonga.api.domain.dto.UsuarioDTO;
 import br.com.luiz_gambalonga.api.services.impl.UsuarioServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 
 class UsuarioResourceTest {
 
@@ -23,7 +26,7 @@ class UsuarioResourceTest {
     private UsuarioResource resource;
     //esta anotação @Mock seria para dizer que serão instancias ficticias e não reais.
     @Mock
-    private UsuarioServiceImpl UsuarioServiceImpl;
+    private UsuarioServiceImpl service;
     @Mock
     private ModelMapper mapper;
 
@@ -37,7 +40,20 @@ class UsuarioResourceTest {
     }
 
     @Test
-    void findByIdUsuario() {
+    void findByIdThenReturnSuccess() {
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(usuarioBanco);
+        Mockito.when(mapper.map(Mockito.any(),Mockito.any())).thenReturn(usuarioDTO);
+        ResponseEntity<UsuarioDTO> response = resource.findByIdUsuario(ID);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(ResponseEntity.class,response.getClass());
+        Assertions.assertEquals(UsuarioDTO.class,response.getBody().getClass());
+
+        Assertions.assertEquals(ID,response.getBody().getId());
+        Assertions.assertEquals(EMAIL,response.getBody().getEmail());
+        Assertions.assertEquals(NAME,response.getBody().getNome());
+        Assertions.assertEquals(SENHA,response.getBody().getSenha());
     }
 
     @Test
