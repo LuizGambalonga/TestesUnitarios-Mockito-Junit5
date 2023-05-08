@@ -8,8 +8,7 @@ class ApiApplicationTests {
 
 	@Test
 	void main() {
-		ApiApplication.main(new String[]{
-		});
+		ApiApplication.main(new String[]{});
 	}
 
 }
